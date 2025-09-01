@@ -7,22 +7,24 @@ export default defineConfig({
     vue(),
     federation({
       name: 'host',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './hostApi': './src/hostApi.ts',
+      },
       remotes: {
         remote1: 'http://localhost:5174/assets/remoteEntry.js',
         remote2: 'http://localhost:5175/assets/remoteEntry.js'
       },
-        server: {
-            cors: {
-                origin: '*', // or specifically ['http://localhost:5173']
-                methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-            },
-        },
       shared: {
-        vue: { singleton: true, eager: true, requiredVersion: '^3.4.0' },
-        'vue-router': { singleton: true, eager: true, requiredVersion: '^4.3.0' }
+        vue: { requiredVersion: false },
+        'vue-router': { requiredVersion: false }
       }
     })
   ],
+    build: {
+        target: 'esnext',
+        cssCodeSplit: false,
+    },
   server: {
       cors: {
           origin: '*', // or specifically ['http://localhost:5173']

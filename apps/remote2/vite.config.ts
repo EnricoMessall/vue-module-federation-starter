@@ -11,15 +11,12 @@ export default defineConfig({
       exposes: {
         './RemoteApp': './src/RemoteApp.vue',
       },
-        server: {
-            cors: {
-                origin: '*', // or specifically ['http://localhost:5173']
-                methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-            },
-        },
+      remotes: {
+        host: 'http://localhost:5173/assets/remoteEntry.js',
+      },
       shared: {
-        vue: { singleton: true, eager: true, requiredVersion: '^3.4.0' },
-        'vue-router': { singleton: true, eager: true, requiredVersion: '^4.3.0' },
+        vue: { requiredVersion: false },
+        'vue-router': { requiredVersion: false },
       },
     }),
   ],

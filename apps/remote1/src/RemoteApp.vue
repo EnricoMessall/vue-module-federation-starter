@@ -1,54 +1,53 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import Overview from './views/Overview.vue';
+import Details from './views/Details.vue';
+import AnalyticsWeekly from './views/AnalyticsWeekly.vue';
+import AnalyticsMonthly from './views/AnalyticsMonthly.vue';
 
 const route = useRoute();
 const page = computed(() => (route.params.page as string) || 'overview');
+const hasChildRoute = computed(() => route.matched.length > 1);
 
-function configureSidebar() {
-  if (typeof window !== 'undefined' && (window as any).HostAPI) {
-    (window as any).HostAPI.setSidebar([
-      { label: 'Overview', icon: 'pi pi-home', to: '/remote1/overview' },
-      { label: 'Details', icon: 'pi pi-list', to: '/remote1/details' },
-      {
-        label: 'Analytics', icon: 'pi pi-chart-line', items: [
-          { label: 'Weekly', command: '/remote1/analytics-weekly' },
-          { label: 'Monthly', to: '/remote1/analytics-monthly' },
-        ]
-      }
-    ]);
-  }
+const componentMap: Record<string, any> = {
+  overview: Overview,
+  details: Details,
+  'analytics-weekly': AnalyticsWeekly,
+  'analytics-monthly': AnalyticsMonthly,
+};
+
+let hostApi: any;
+
+async function configureSidebar() {
+  const mod = await import('host/hostApi');
+  hostApi = (mod as any)?.default ?? mod;
+
+  const sidebar = [
+    { label: 'Overview', icon: 'pi pi-home', to: '/remote1/overview' },
+    { label: 'Details', icon: 'pi pi-list', to: '/remote1/details' },
+    {
+      label: 'Analytics', icon: 'pi pi-chart-line', items: [
+        { label: 'Weekly', to: '/remote1/analytics-weekly' },
+        { label: 'Monthly', to: '/remote1/analytics-monthly' },
+      ]
+    }
+  ];
+
+  hostApi?.setSidebar(sidebar as any);
 }
 
 onMounted(() => {
   configureSidebar();
 });
-
-onBeforeUnmount(() => {
-  if ((window as any).HostAPI) {
-    (window as any).HostAPI.clearSidebar();
-  }
-});
 </script>
 
 <template>
   <section>
-    <h2>Remote 1</h2>
-    <p>Current page: <strong>{{ page }}</strong></p>
-    <div v-if="page === 'overview'">
-      <p>This is the overview page provided by Remote 1.</p>
-    </div>
-    <div v-else-if="page === 'details'">
-      <p>Details content from Remote 1.</p>
-    </div>
-    <div v-else-if="page === 'analytics-weekly'">
-      <p>Weekly analytics from Remote 1.</p>
-    </div>
-    <div v-else-if="page === 'analytics-monthly'">
-      <p>Monthly analytics from Remote 1.</p>
-    </div>
+    <router-view v-if="hasChildRoute" />
     <div v-else>
-      <p>Unknown page. Choose an item from the sidebar.</p>
+      <component v-if="componentMap[page]" :is="componentMap[page]" />
+      <p v-else>Unknown page. Choose an item from the sidebar.</p>
     </div>
   </section>
 </template>

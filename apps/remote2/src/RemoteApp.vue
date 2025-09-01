@@ -5,29 +5,26 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const page = computed(() => (route.params.page as string) || 'dashboard');
 
-function configureSidebar() {
-  if (typeof window !== 'undefined' && (window as any).HostAPI) {
-    (window as any).HostAPI.setSidebar([
-      { label: 'Dashboard', icon: 'pi pi-home', to: '/remote2/dashboard' },
-      {
-        label: 'Reports', icon: 'pi pi-file', items: [
-          { label: 'Sales', to: '/remote2/reports-sales' },
-          { label: 'Inventory', to: '/remote2/reports-inventory' }
-        ]
-      },
-      { label: 'Settings', icon: 'pi pi-cog', to: '/remote2/settings' }
-    ]);
-  }
+let hostApi: any;
+
+async function configureSidebar() {
+  const mod = await import('host/hostApi');
+  hostApi = (mod as any)?.default ?? mod;
+
+  hostApi?.setSidebar([
+    { label: 'Dashboard', icon: 'pi pi-home', to: '/remote2/dashboard' },
+    {
+      label: 'Reports', icon: 'pi pi-file', items: [
+        { label: 'Sales', to: '/remote2/reports-sales' },
+        { label: 'Inventory', to: '/remote2/reports-inventory' }
+      ]
+    },
+    { label: 'Settings', icon: 'pi pi-cog', to: '/remote2/settings' }
+  ]);
 }
 
 onMounted(() => {
   configureSidebar();
-});
-
-onBeforeUnmount(() => {
-  if ((window as any).HostAPI) {
-    (window as any).HostAPI.clearSidebar();
-  }
 });
 </script>
 

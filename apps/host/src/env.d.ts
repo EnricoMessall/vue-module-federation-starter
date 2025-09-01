@@ -11,13 +11,3 @@ declare module 'remote2/RemoteApp' {
   const component: DefineComponent<{}, {}, any>;
   export default component;
 }
-
-declare global {
-  interface Window {
-    HostAPI: {
-      setSidebar: (items: any[]) => void;
-      clearSidebar: () => void;
-      navigate: (to: string) => void;
-    };
-  }
-}
