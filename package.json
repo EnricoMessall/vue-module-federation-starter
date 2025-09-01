@@ -1,0 +1,19 @@
+{
+  "name": "vue-module-test",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "echo 'Use: npm run dev:host | dev:remote1 | dev:remote2'",
+    "dev:host": "npm --workspace=apps/host run dev",
+    "dev:remote1": "npm --workspace=apps/remote1 run dev",
+    "dev:remote2": "npm --workspace=apps/remote2 run dev",
+    "build": "npm -w apps/remote1 run build && npm -w apps/remote2 run build && npm -w apps/host run build",
+    "preview": "npm -w apps/host run preview"
+  },
+  "dependencies": {
+    "vite": "^5.4.19"
+  }
+}
